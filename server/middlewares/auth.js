@@ -17,8 +17,8 @@ export const isAuthenticated = asyncError(async (req, res, next) => {
     next();
 });
 
-// export const isAdmin = asyncError(async (req, res, next) => {
-//     if (req.user.role !== "admin")
-//         return next(new ErrorHandler("Only Admin allowed", 401));
-//     next();
-// });
+export const isAdmin = asyncError(async (req, res, next) => {
+    if (req.user.role !== "admin")
+        return next(new ErrorHandler("Only Admin allowed", 401));
+    next();
+});
