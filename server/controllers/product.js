@@ -9,11 +9,11 @@ export const getAllProducts = asyncError(async (req, res, next) => {
   const { keyword, category } = req.query;
 
   const products = await Product.find({
-    // name: {
-    //   $regex: keyword ? keyword : "",
-    //   $options: "i",
-    // },
-    // category: category ? category : undefined,
+    name: {
+      $regex: keyword ? keyword : "",
+      $options: "i",
+    },
+    category: category ? category : undefined,
   });
 
   res.status(200).json({
@@ -182,12 +182,11 @@ export const getAllCategories = asyncError(async (req, res, next) => {
 });
 
 export const deleteCategory = asyncError(async (req, res, next) => {
-
   const category = await Category.findById(req.params.id);
   if (!category) return next(new ErrorHandler("Category Not Found", 404));
   const products = await Product.find({ category: category._id });
 
-  for (let i = 0; i < products.length; i++) { 
+  for (let i = 0; i < products.length; i++) {
     const product = products[i];
     product.category = undefined;
     await product.save();
