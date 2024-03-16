@@ -1,5 +1,13 @@
 import express from "express";
-import { changePassword, getMyProfile, login, logOut, signup, updatePic, updateProfile } from "../controllers/user.js";
+import {
+  changePassword,
+  getMyProfile,
+  login,
+  logOut,
+  signup,
+  updatePic,
+  updateProfile,
+} from "../controllers/user.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -10,8 +18,8 @@ router.post("/new", singleUpload, signup);
 router.get("/me", isAuthenticated, getMyProfile);
 router.get("/logout", isAuthenticated, logOut);
 
-router.put("/updateprofile", isAuthenticated, updateProfile)
-router.put("/changepassword", isAuthenticated, changePassword)
-router.put("/updatepic", isAuthenticated, updatePic)
+router.put("/updateprofile", isAuthenticated, updateProfile);
+router.put("/changepassword", isAuthenticated, changePassword);
+router.put("/updatepic", isAuthenticated, singleUpload, updatePic);
 
 export default router;
