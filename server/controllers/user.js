@@ -1,7 +1,7 @@
 import { User } from "../models/user.js";
 import ErrorHandler from "../utils/error.js";
 import { asyncError } from "../middlewares/error.js";
-import { cookieOptions, sendToken } from "../utils/features.js";
+import { cookieOptions, getDataUri, sendToken } from "../utils/features.js";
 
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -29,6 +29,7 @@ export const signup = asyncError(async (req, res, next) => {
   let user = await User.findOne({ email });
   if (user) return next(new ErrorHandler("User Already Exist", 400));
 
+  const file = getDataUri();
   user = await User.create({
     avatar,
     name,
@@ -85,7 +86,6 @@ export const updateProfile = asyncError(async (req, res, next) => {
   });
 });
 
-
 export const changePassword = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id).select("+password");
 
@@ -106,5 +106,14 @@ export const changePassword = asyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Password Changed Successully",
+  });
+});
+
+export const updatePic = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    message: "Avatar Updated Successfully",
   });
 });
