@@ -1,6 +1,7 @@
 import { asyncError } from "../middlewares/error.js";
 import { Order } from "../models/order.js";
 import { Product } from "../models/product.js";
+import { stripe } from "../server.js";
 import ErrorHandler from "../utils/error.js";
 
 export const processPayment = asyncError(async (req, res, next) => {
