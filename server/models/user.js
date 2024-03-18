@@ -40,7 +40,7 @@ const schema = new mongoose.Schema({
   role: {
     type: String,
     enum: ["admin", "user"],
-    default: "admin",
+    default: "user",
   },
   avatar: {
     public_id: String,
