@@ -29,7 +29,7 @@ export const cookieOptions = {
   sameSite: process.env.NODE_ENV === "Development" ? false : "none",
 };
 
-export const sendEmail = async (subject, to, text) => {
+export const sendEmail = async (subject, to, html) => {
     const transporter = createTransport({
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
@@ -42,6 +42,8 @@ export const sendEmail = async (subject, to, text) => {
 await transporter.sendMail({
     to,
     subject,
-    text,
+    html,
     });
 };
+
+
