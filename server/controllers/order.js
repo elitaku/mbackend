@@ -31,6 +31,17 @@ export const createOrder = asyncError(async (req, res, next) => {
     totalAmount,
   } = req.body;
 
+  // Check product stock before creating the order
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+    if (!product || product.stock < item.quantity) {
+      return res.status(400).json({
+        success: false,
+        message: "Insufficient stock for one or more items",
+      });
+    }
+  }
+
   const order = await Order.create({
     user: req.user._id,
     shippingInfo,
@@ -43,9 +54,10 @@ export const createOrder = asyncError(async (req, res, next) => {
     totalAmount,
   });
 
-  for (let i = 0; i < orderItems.length; i++) {
-    const product = await Product.findById(orderItems[i].product);
-    product.stock -= orderItems[i].quantity;
+  // Update product stock
+  for (const item of orderItems) {
+    const product = await Product.findById(item.product);
+    product.stock -= item.quantity;
     await product.save();
   }
 
@@ -60,6 +72,7 @@ export const createOrder = asyncError(async (req, res, next) => {
     message: "Order Placed Successfully",
   });
 });
+
 
 // export const createOrder = asyncError(async (req, res, next) => {
 //   const {
