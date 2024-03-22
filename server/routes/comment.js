@@ -5,7 +5,7 @@ import { isAuthenticated } from "../middlewares/auth.js";
 const router = express.Router();
 
 // API endpoints
-router.get("/all", getAllComments);
+router.get("/all/:productId", getAllComments);
 router.post("/create", isAuthenticated, addComment);
 
 export default router;

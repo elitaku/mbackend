@@ -6,12 +6,18 @@ import { asyncError } from "../middlewares/error.js";
 // Get all comments
 export const getAllComments = asyncError(async (req, res, next) => {
   try {
-    const comments = await Comment.find();
+    const productId = req.params.productId; // Assuming product ID is passed as a parameter
+
+    // Find all comments related to the specified product ID
+    const comments = await Comment.find({ product: productId });
+
     res.json(comments);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 // Add a new comment
 export const addComment = asyncError(async (req, res, next) => {
