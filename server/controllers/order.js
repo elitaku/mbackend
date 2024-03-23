@@ -191,3 +191,127 @@ export const proccessOrder = asyncError(async (req, res, next) => {
 //     message: "Order Processed Successfully",
 //   });
 // });
+
+//for bar chart
+export const getOrdersCountByDay = asyncError(async (req, res, next) => {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+
+  const ordersCountByProduct = await Order.aggregate([
+    {
+      $match: {
+        createdAt: { $gte: startOfToday, $lte: endOfToday }
+      }
+    },
+    { $unwind: "$orderItems" },
+    {
+      $group: {
+        _id: "$orderItems.product",
+        totalAmount: { $sum: "$orderItems.price" }
+      }
+    },
+    {
+      $lookup: {
+        from: "products",
+        localField: "_id",
+        foreignField: "_id",
+        as: "productData"
+      }
+    },
+    { $unwind: "$productData" },
+    {
+      $project: {
+        _id: "$productData.name",
+        totalAmount: 1
+      }
+    },
+    {
+      $sort: { totalAmount: -1 }
+    }
+  ]);
+
+  res.status(200).json({
+    success: true,
+    ordersCountByProduct,
+  });
+});
+
+//for pie chart
+export const getOrderedProductsCountByCategory = asyncError(async (req, res, next) => {
+  const productsCountByCategory = await Order.aggregate([
+    { $unwind: "$orderItems" },
+    {
+      $lookup: {
+        from: "products",
+        localField: "orderItems.product",
+        foreignField: "_id",
+        as: "productInfo"
+      }
+    },
+    { $unwind: "$productInfo" },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "productInfo.category",
+        foreignField: "_id",
+        as: "categoryInfo"
+      }
+    },
+    { $unwind: "$categoryInfo" },
+    {
+      $group: {
+        _id: "$categoryInfo.category",
+        count: { $sum: "$orderItems.quantity" }
+      }
+    },
+    {
+      $sort: { count: -1 }
+    }
+  ]);
+
+
+res.status(200).json({
+    success: true,
+    productsCountByCategory,
+  });
+});
+
+export const getOrdersSumByMonth = async (req, res) => {
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+  try {
+    const orders = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: threeMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          totalAmount: { $sum: "$totalAmount" }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    console.log(orders);
+
+    res.status(200).json({
+      success: true,
+      ordersSumByMonth: orders
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'An error occurred while fetching the orders sum by month.'
+    });
+  }
+};
