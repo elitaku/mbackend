@@ -30,9 +30,11 @@ import user from "./routes/user.js";
 import product from "./routes/product.js";
 import order from "./routes/order.js";
 import comment from "./routes/comment.js";
+import category from "./routes/category.js"
 
 app.use("/api/v1/user", user);
 app.use("/api/v1/product", product);
+app.use("/api/v1/category", category);
 app.use("/api/v1/order", order);
 app.use("/api/v1/comment", comment);
 
