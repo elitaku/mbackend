@@ -99,3 +99,36 @@ export const addComment = asyncError(async (req, res, next) => {
 
   // }
 });
+
+// Delete a comment
+export const deleteComment = asyncError(async (req, res, next) => {
+  try {
+    const commentId = req.params.id; 
+    const userId = req.user.id; 
+
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ success: false, message: "Comment not found" });
+    }
+
+    if (comment.user.toString() !== userId && req.user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: "Unauthorized to delete this comment" });
+    }
+
+    await comment.deleteOne();
+
+    if (req.user.role !== 'admin') {
+      const user = await User.findById(userId);
+      if (user) {
+        user.comments = user.comments.filter(comment => comment.toString() !== commentId);
+        await user.save();
+      }
+    }
+
+    res.status(200).json({ success: true, message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
