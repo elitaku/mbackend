@@ -3,7 +3,6 @@ import { Product } from "../models/product.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri } from "../utils/features.js";
 import cloudinary from "cloudinary";
-import { Category } from "../models/category.js";
 
 // export const getAllProducts = asyncError(async (req, res, next) => {
 //   const { keyword, category } = req.query;
@@ -43,7 +42,6 @@ export const getAllProducts = asyncError(async (req, res, next) => {
     products,
   });
 });
-
 
 export const getAdminProducts = asyncError(async (req, res, next) => {
   const products = await Product.find({}).populate("category");
@@ -186,39 +184,82 @@ export const deleteProduct = asyncError(async (req, res, next) => {
   }
 });
 
-export const addCategory = asyncError(async (req, res, next) => {
-  await Category.create(req.body);
+// export const addCategoryImage = asyncError(async (req, res, next) => {
+//   const category = await Category.findById(req.params.id);
+//   if (!category) return next(new ErrorHandler("Category not found", 404));
 
-  res.status(201).json({
-    success: true,
-    message: "Category Added Successfully",
-  });
-});
+//   if (!req.file) return next(new ErrorHandler("Please add image", 400));
 
-export const getAllCategories = asyncError(async (req, res, next) => {
-  const categories = await Category.find({});
+//   const file = getDataUri(req.file);
+//   const myCloud = await cloudinary.v2.uploader.upload(file.content);
+//   const image = {
+//     public_id: myCloud.public_id,
+//     url: myCloud.secure_url,
+//   };
 
-  res.status(200).json({
-    success: true,
-    categories,
-  });
-});
+//   category.images.push(image);
+//   await category.save();
 
-export const deleteCategory = asyncError(async (req, res, next) => {
-  const category = await Category.findById(req.params.id);
-  if (!category) return next(new ErrorHandler("Category Not Found", 404));
-  const products = await Product.find({ category: category._id });
+//   res.status(200).json({
+//     success: true,
+//     message: "Image Added Successfully",
+//   });
+// });
 
-  for (let i = 0; i < products.length; i++) {
-    const product = products[i];
-    product.category = undefined;
-    await product.save();
-  }
+// export const addCategory = asyncError(async (req, res, next) => {
+//   // await Category.create(req.body);
 
-  await category.deleteOne();
+//   // res.status(201).json({
+//   //   success: true,
+//   //   message: "Category Added Successfully",
+//   // });
 
-  res.status(200).json({
-    success: true,
-    message: "Category Deleted Successfully",
-  });
-});
+//   const { category } = req.body;
+
+//   if (!req.file) return next(new ErrorHandler("Please add image", 400));
+
+//   const file = getDataUri(req.file);
+//   const myCloud = await cloudinary.v2.uploader.upload(file.content);
+//   const image = {
+//     public_id: myCloud.public_id,
+//     url: myCloud.secure_url,
+//   };
+
+//   await Category.create({
+//     category,
+//     images: [image],
+//   });
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Category Created Successfully",
+//   });
+// });
+
+// export const getAllCategories = asyncError(async (req, res, next) => {
+//   const categories = await Category.find({});
+
+//   res.status(200).json({
+//     success: true,
+//     categories,
+//   });
+// });
+
+// export const deleteCategory = asyncError(async (req, res, next) => {
+//   const category = await Category.findById(req.params.id);
+//   if (!category) return next(new ErrorHandler("Category Not Found", 404));
+//   const products = await Product.find({ category: category._id });
+
+//   for (let i = 0; i < products.length; i++) {
+//     const product = products[i];
+//     product.category = undefined;
+//     await product.save();
+//   }
+
+//   await category.deleteOne();
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Category Deleted Successfully",
+//   });
+// });
