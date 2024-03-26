@@ -87,6 +87,23 @@ export const signup = asyncError(async (req, res, next) => {
   sendToken(user, res, `Registered Successfully`, 201);
 });
 
+export const getAllUsers = asyncError (async (req, res) => {
+  const loggedInUserId = req.user._id;
+
+  try {
+      const users = await User.find({ _id: { $ne: loggedInUserId } })
+      res.status(200).json({
+          success: true,
+          users
+      });
+
+  } catch (err) {
+      console.log("Error retrieving users", err);
+
+      res.status(500).json({ message: "Error retrieving users" });
+  }
+
+});
 
 export const getMyProfile = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
@@ -283,3 +300,22 @@ export const googleLogin = asyncError(async (req, res, next) => {
 
   sendToken(user, res, `Welcome Back, ${user.name}`, 200);
 })
+
+export const deleteUser = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return next(new ErrorHandler("User Not Found", 404));
+  const users = await User.find({ user: user._id });
+
+  for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      user.user = undefined;
+      await user.save();
+  }
+
+  await user.deleteOne();
+
+  res.status(200).json({
+  success: true,
+  message: "user Deleted Successfully",
+  });
+});
