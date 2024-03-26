@@ -184,66 +184,28 @@ export const deleteProduct = asyncError(async (req, res, next) => {
   }
 });
 
-// export const addCategoryImage = asyncError(async (req, res, next) => {
-//   const category = await Category.findById(req.params.id);
-//   if (!category) return next(new ErrorHandler("Category not found", 404));
+export const addCategory = asyncError(async (req, res, next) => {
+  await Category.create(req.body);
 
-//   if (!req.file) return next(new ErrorHandler("Please add image", 400));
+  res.status(201).json({
+    success: true,
+    message: "Category Added Successfully",
+  });
+});
 
-//   const file = getDataUri(req.file);
-//   const myCloud = await cloudinary.v2.uploader.upload(file.content);
-//   const image = {
-//     public_id: myCloud.public_id,
-//     url: myCloud.secure_url,
-//   };
+export const getAllCategories = asyncError(async (req, res, next) => {
+  try{
+    const categories = await Category.find({});
 
-//   category.images.push(image);
-//   await category.save();
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Image Added Successfully",
-//   });
-// });
-
-// export const addCategory = asyncError(async (req, res, next) => {
-//   // await Category.create(req.body);
-
-//   // res.status(201).json({
-//   //   success: true,
-//   //   message: "Category Added Successfully",
-//   // });
-
-//   const { category } = req.body;
-
-//   if (!req.file) return next(new ErrorHandler("Please add image", 400));
-
-//   const file = getDataUri(req.file);
-//   const myCloud = await cloudinary.v2.uploader.upload(file.content);
-//   const image = {
-//     public_id: myCloud.public_id,
-//     url: myCloud.secure_url,
-//   };
-
-//   await Category.create({
-//     category,
-//     images: [image],
-//   });
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Category Created Successfully",
-//   });
-// });
-
-// export const getAllCategories = asyncError(async (req, res, next) => {
-//   const categories = await Category.find({});
-
-//   res.status(200).json({
-//     success: true,
-//     categories,
-//   });
-// });
+    res.status(200).json({
+      success: true,
+      categories,
+    });
+  }catch(e){
+    console.log(e)
+  }
+  
+});
 
 // export const deleteCategory = asyncError(async (req, res, next) => {
 //   const category = await Category.findById(req.params.id);
