@@ -21,5 +21,12 @@ const commentSchema = new mongoose.Schema({
   }
 });
 
-export const Comment = mongoose.model("Comment", commentSchema);
+commentSchema.virtual('userName', {
+  ref: 'User',
+  localField: 'user',
+  foreignField: '_id',
+  justOne: true,
+  options: { select: 'name' }
+});
 
+export const Comment = mongoose.model("Comment", commentSchema);
