@@ -56,6 +56,24 @@ const schema = new mongoose.Schema({
     required: false,
     unique: true,
   },
+  contactRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ],
+  contacts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
+  sentContactRequest: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ],
   otp: Number,
   otp_expire: Date,
 });
