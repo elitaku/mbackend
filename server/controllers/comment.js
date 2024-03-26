@@ -132,3 +132,25 @@ export const deleteComment = asyncError(async (req, res, next) => {
   }
 });
 
+export const getProductRatings = asyncError(async (req, res, next) => {
+  try {
+    const productId = req.params.productId; 
+
+    const comments = await Comment.find({ product: productId });
+
+    if (comments.length === 0) {
+      return res.status(404).json({ success: false, message: "No ratings found for this product" });
+    }
+
+    let totalRating = 0;
+    comments.forEach(comment => {
+      totalRating += comment.rating;
+    });
+    const averageRating = totalRating / comments.length;
+
+    res.status(200).json({ success: true, averageRating });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
