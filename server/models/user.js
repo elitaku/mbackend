@@ -65,7 +65,8 @@ const schema = new mongoose.Schema({
   contacts: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
+      ref: "User",
+      unique: true,
     }
   ],
   sentContactRequest: [
