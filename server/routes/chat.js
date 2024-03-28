@@ -8,7 +8,8 @@ import {
   getAllContacts,
   sendMessage,
   getUserDetails,
-  getChatRoomDetails
+  getChatRoomDetails,
+  getAllMessages
 } from "../controllers/chat.js";
 
 const router = express.Router();
@@ -18,7 +19,7 @@ router.get("/contact-request", isAuthenticated, getContactRequest);
 router.get("/accepted-contacts", isAuthenticated, getAllContacts);
 router.get("/user/:userId", isAuthenticated, getUserDetails);
 router.get("/messages/:senderId/:recepientId", isAuthenticated, getChatRoomDetails)
-
+router.get("/getAllMessages/:userId", isAuthenticated, getAllMessages)
 router.post("/contact-request", isAuthenticated, sendContactRequest);
 router.post("/contact-request/accept", isAuthenticated, acceptContactRequest);
 router.post("/messages", isAuthenticated, sendMessage)

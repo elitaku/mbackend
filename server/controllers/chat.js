@@ -108,18 +108,62 @@ export const acceptContactRequest = asyncError(async (req, res) => {
 })
 
 export const getAllContacts = asyncError(async (req, res) => {
+  // try {
+  //   const userId = req.user._id;
+
+  //   const user = await User.findById(userId).populate(
+  //     "contacts",
+  //     "name email avatar"
+  //   );
+  //   const acceptedContacts = user.contacts;
+
+  //   res.status(200).json({
+  //     success: true,
+  //     acceptedContacts
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ error: "Internal Server Error" });
+  // }
   try {
     const userId = req.user._id;
-
-    const user = await User.findById(userId).populate(
+  
+    let user = await User.findById(userId).populate(
       "contacts",
       "name email avatar"
     );
-    const acceptedContacts = user.contacts;
-
+  
+    // Fetch the latest message for each contact
+    const contactsWithLatestMessage = await Promise.all(user.contacts.map(async (contact) => {
+      const latestMessage = await Message.findOne({
+        $or: [
+          { senderId: contact._id, recepientId: userId },
+          { senderId: userId, recepientId: contact._id }
+        ]
+      }).sort('-timeStamp');
+  
+      return {
+        ...contact._doc,
+        latestMessage
+      };
+    }));
+  
+    // Sort the contacts based on the timestamp of the latest message
+    const sortedContacts = contactsWithLatestMessage.sort((a, b) => {
+      if (a.latestMessage && b.latestMessage) {
+        return b.latestMessage.timeStamp - a.latestMessage.timeStamp;
+      } else if (a.latestMessage) {
+        return -1;
+      } else if (b.latestMessage) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  
     res.status(200).json({
       success: true,
-      acceptedContacts
+      acceptedContacts: sortedContacts
     });
   } catch (error) {
     console.error(error);
@@ -170,8 +214,8 @@ export const getChatRoomDetails = asyncError(async (req, res) => {
   try {
     const { senderId, recepientId } = req.params;
 
-    console.log('getChatRoomDetails: ', senderId)
-    console.log('getChatRoomDetails: ', recepientId)
+    console.log('senderId: ', senderId)
+    console.log('recepientId: ', recepientId)
 
 
     const messages = await Message.find({
@@ -190,6 +234,26 @@ export const getChatRoomDetails = asyncError(async (req, res) => {
 
   } catch (error) {
     console.log('getChatRoomDetails error: ', error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error});
   }
 });
+
+export const getAllMessages = asyncError(async (req, res) => {
+  try{
+    const {userId} = req.params;
+    const messages = await Message.find({ $or: [
+      { senderId: userId},
+      {recepientId: userId },
+    ],}).populate("senderId", "_id name");
+    
+    res.status(200).json({
+      success: true,
+      messages
+    });
+  }catch(error){
+    console.log('getAllMessages error: ', error);
+    res.status(500).json({ error: error});
+  }
+  
+
+})
